@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <malloc.h>
+// #include <malloc.h>
 
 const long long max_size = 2000;         // max length of strings
 const long long N = 40;                  // number of closest words that will be shown
@@ -27,8 +27,8 @@ int main(int argc, char **argv) {
   char st1[max_size];
   char *bestw[N];
   char file_name[max_size], st[max_sent][max_size];
-  float dist, len, bestd[N], vec[max_size];
   long long words, size, a, b, c, d, cn, bi[max_sent];
+  float dist, len, bestd[N], vec[max_size];
   char ch;
   float *M;
   char *vocab;
@@ -97,16 +97,16 @@ int main(int argc, char **argv) {
     }
     cn++;
     for (a = 0; a < cn; a++) {
-      for (b = 0; b < words; b++) if (!strcmp(&vocab[b * max_w], st[a])) break;
+      for (b = 0; b < words; b++) if (!strcmp(&vocab[b * max_w], st[a]) ) break;
       if (b == words) b = -1;
       bi[a] = b;
       printf("\nWord: %s  Position in vocabulary: %lld\n", st[a], bi[a]);
       if (b == -1) {
         printf("Out of dictionary word!\n");
-	/*        break; */
+	//        break;
       }
     }
-    if (b == -1) continue;
+    //    if (b == -1) continue;
     printf("\n                                              Word       Cosine distance\n------------------------------------------------------------------------\n");
     for (a = 0; a < size; a++) vec[a] = 0;
     for (b = 0; b < cn; b++) {
@@ -123,6 +123,7 @@ int main(int argc, char **argv) {
       a = 0;
       for (b = 0; b < cn; b++) if (bi[b] == c) a = 1;
       if (a == 1) continue;
+      if (!( vocab[c * max_w] >= 'A' && vocab[c * max_w] <= 'Z' )) continue;
       dist = 0;
       for (a = 0; a < size; a++) dist += vec[a] * M[a + c * size];
       for (a = 0; a < N; a++) {

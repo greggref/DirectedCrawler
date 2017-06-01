@@ -15,20 +15,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <malloc.h>
+//#include <malloc.h>
 
 const long long max_size = 2000;         // max length of strings
 const long long N = 40;                  // number of closest words that will be shown
 const long long max_w = 50;              // max length of vocabulary entries
-const long long max_sent = 2000 ;       // max nb of words in input
 
 int main(int argc, char **argv) {
   FILE *f;
   char st1[max_size];
   char *bestw[N];
-  char file_name[max_size], st[max_sent][max_size];
+  char file_name[max_size], st[100][max_size];
   float dist, len, bestd[N], vec[max_size];
-  long long words, size, a, b, c, d, cn, bi[max_sent];
+  float hicap = 0.05;
+  float lowcap = -0.05;
+  long long words, size, a, b, c, d, cn, bi[100];
   char ch;
   float *M;
   char *vocab;
@@ -103,15 +104,17 @@ int main(int argc, char **argv) {
       printf("\nWord: %s  Position in vocabulary: %lld\n", st[a], bi[a]);
       if (b == -1) {
         printf("Out of dictionary word!\n");
-	/*        break; */
+        break;
       }
     }
     if (b == -1) continue;
     printf("\n                                              Word       Cosine distance\n------------------------------------------------------------------------\n");
+
     for (a = 0; a < size; a++) vec[a] = 0;
     for (b = 0; b < cn; b++) {
       if (bi[b] == -1) continue;
-      for (a = 0; a < size; a++) vec[a] += M[a + bi[b] * size];
+      for (a = 0; a < size; a++) if((M[a + bi[b] * size] > hicap) || (M[a + bi[b] * size] < lowcap)) vec[a] += M[a + bi[b] * size];
+      //      for (a = 0; a < size; a++) if((M[a + bi[b] * size] < hicap) && (M[a + bi[b] * size] > lowcap)) vec[a] += M[a + bi[b] * size];
     }
     len = 0;
     for (a = 0; a < size; a++) len += vec[a] * vec[a];
@@ -124,7 +127,7 @@ int main(int argc, char **argv) {
       for (b = 0; b < cn; b++) if (bi[b] == c) a = 1;
       if (a == 1) continue;
       dist = 0;
-      for (a = 0; a < size; a++) dist += vec[a] * M[a + c * size];
+      for (a = 0; a < size; a++) if((M[a + c * size] > hicap) || (M[a + c * size] < lowcap)) dist += vec[a] * M[a + c * size];
       for (a = 0; a < N; a++) {
         if (dist > bestd[a]) {
           for (d = N - 1; d > a; d--) {
